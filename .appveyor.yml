@@ -50,14 +50,14 @@ build_script:
     { 
       make --directory "artifacts/bin64"
 
-      dotnet build src/Bitshuffle.PInvoke/Bitshuffle.PInvoke.csproj -c $Env:CONFIGURATION /p:Build=$Env:APPVEYOR_BUILD_NUMBER /p:IsFinalBuild=$Env:APPVEYOR_REPO_TAG
+      dotnet build src/Bitshuffle.PInvoke/Bitshuffle.PInvoke.csproj -c $Env:CONFIGURATION /p:Build=$Env:APPVEYOR_BUILD_NUMBER /p:IsFinalBuild=$Env:APPVEYOR_REPO_TAG /p:IsPublicBuild=True
     }
     elseif ($isWindows)
     { 
       msbuild artifacts/bin32/bitshuffle.vcxproj /p:Configuration=$Env:CONFIGURATION
       msbuild artifacts/bin64/bitshuffle.vcxproj /p:Configuration=$Env:CONFIGURATION
 
-      dotnet build src/Bitshuffle.PInvoke/Bitshuffle.PInvoke.csproj -c $Env:CONFIGURATION /p:Build=$Env:APPVEYOR_BUILD_NUMBER /p:IsFinalBuild=$Env:APPVEYOR_REPO_TAG /p:IsPublicBuild=True
+      dotnet build src/Bitshuffle.PInvoke/Bitshuffle.PInvoke.csproj -c $Env:CONFIGURATION /p:Build=$Env:APPVEYOR_BUILD_NUMBER /p:IsFinalBuild=$Env:APPVEYOR_REPO_TAG
     }
 
 after_build:
