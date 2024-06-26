@@ -1,0 +1,10 @@
+<Project>
+
+  <Import Project="./build/build.props" />
+
+  <PropertyGroup>
+    <PackageLicenseExpression Condition="$(PackageLicenseExpression) == ''">MIT</PackageLicenseExpression>
+    <PackageProjectUrl Condition="$(PackageProjectUrl) == ''">https://github.com/Apollo3zehn/Bitshuffle.PInvoke</PackageProjectUrl>
+  </PropertyGroup>
+
+</Project>

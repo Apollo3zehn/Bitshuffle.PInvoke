@@ -1,0 +1,119 @@
+version: '{build}'
+clone_depth: 1
+
+image:
+- Visual Studio 2022
+- Ubuntu
+
+environment:
+  ApiKey:
+    secure: SeomICfFXAQobyK5uMGeAhb0uljBxicG4Z56pWxWCXA=
+  SatelliteJobName: 'Image: Visual Studio 2022'
+  FileName: 'bitshuffle.dll'
+
+branches:
+  only:
+  - main
+  - dev
+
+configuration:
+  - Release
+
+init:
+  - ps: git config --global core.autocrlf true
+
+install:
+- ps: |
+    if ($isLinux) 
+    { 
+      sudo apt-get update
+      # apt-get --yes install g++-multilib
+      sudo apt-get --yes install nasm
+    }
+    elseif ($isWindows)
+    {
+      choco install nasm
+      $env:Path += ";C:\Program Files\NASM"
+    }
+
+before_build:
+- ps: dotnet --info
+- ps: "Get-ChildItem Env:"
+- ps: ./init_solution.ps1
+- ps: Import-Module ./build/Start-ArtifactDownload.ps1 -Force
+- ps: | 
+    if ($isLinux) 
+    { 
+      #New-Item -Force -ItemType directory -Path "artifacts/download/bin32/"
+      #Start-ArtifactDownload -JobName $env:SatelliteJobName -SourceFileName "lib32" -TargetFilePath "artifacts/download/bin32/$env:FileName" -ApiKey $env:ApiKey
+      New-Item -Force -ItemType directory -Path "artifacts/download/bin64/"
+      Start-ArtifactDownload -JobName $env:SatelliteJobName -SourceFileName "lib64" -TargetFilePath "artifacts/download/bin64/$env:FileName" -ApiKey $env:ApiKey 
+    }
+
+build_script:
+- ps: |
+    if ($isLinux) 
+    { 
+      New-Item -Force -ItemType directory -Path "artifacts/bin64"
+      cd native/bitshuffle
+      make -f Makefile.unx
+      mv bin/libbitshuffle.so ../../artifacts/bin64/libbitshuffle.so
+      cd ../../
+
+      dotnet build src/Bitshuffle.PInvoke/Bitshuffle.PInvoke.csproj -c $Env:CONFIGURATION /p:Build=$Env:APPVEYOR_BUILD_NUMBER /p:IsFinalBuild=$Env:APPVEYOR_REPO_TAG /p:IsPublicBuild=True
+    }
+    elseif ($isWindows)
+    { 
+      # 32-bit builds are not working right now because ASM sections for x86 are missing (https://github.com/intel/bitshuffle/issues/3#issuecomment-549359980).
+      # New-Item -Force -ItemType directory -Path "artifacts/bin32"
+      # cmd.exe /c "`"C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars32.bat`" & cd native/bitshuffle & nmake -f Makefile.nmake arch=32 & move bitshuffle.dll ../../artifacts/bin32"
+
+      # Remove-Item -Recurse -Force native/bitshuffle/bin
+
+      New-Item -Force -ItemType directory -Path "artifacts/bin64"
+      cmd.exe /c "`"C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat`" & cd native/bitshuffle & nmake -f Makefile.nmake & move bitshuffle.dll ../../artifacts/bin64"
+      
+      dotnet build src/Bitshuffle.PInvoke/Bitshuffle.PInvoke.csproj -c $Env:CONFIGURATION /p:Build=$Env:APPVEYOR_BUILD_NUMBER /p:IsFinalBuild=$Env:APPVEYOR_REPO_TAG
+    }
+
+after_build:
+- ps: |
+    if ($isWindows) 
+    { 
+      #Push-AppveyorArtifact "artifacts/bin32/$env:FileName" -FileName "lib32"
+      Push-AppveyorArtifact "artifacts/bin64/$env:FileName" -FileName "lib64"
+    }
+
+test_script:
+- ps: |
+    dotnet test tests/Bitshuffle.PInvoke.Tests -c $Env:CONFIGURATION /p:BuildProjectReferences=false
+
+after_test:
+  - ps: if (-Not $isLinux) { Remove-Item artifacts/packages/*.nupkg }
+
+artifacts:
+  - path: artifacts/packages/**/*.nupkg
+
+deploy:
+
+# MyGet (dev)
+  - provider: NuGet
+    server: https://www.myget.org/F/apollo3zehn-dev/api/v2/package
+    api_key:
+      secure: DVadlPknnKPMR4F2+3VqeU7BFFmtLcXDHzkySA590MqQNIdzbx8HRuaPwDVbHRqX
+    skip_symbols: true
+    artifact: /.*\.nupkg/ 
+    on:
+      branch: dev
+      CI_LINUX: true
+
+# NuGet (master)
+  - provider: NuGet
+    server: https://www.nuget.org/api/v2/package
+    api_key:
+      secure: sRqSXx9AEunKwTrsXo9ppB8cGnMXaJI+ICjvoTaKLBS8curIxXuKxfzcw7iKCPjg
+    skip_symbols: true
+    artifact: /.*\.nupkg/ 
+    on:
+      CI_LINUX: true
+      APPVEYOR_REPO_TAG: true
