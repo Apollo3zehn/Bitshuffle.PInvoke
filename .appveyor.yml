@@ -54,8 +54,8 @@ build_script:
     }
     elseif ($isWindows)
     { 
-      msbuild artifacts/bin32/bitshuffle/bitshuffle.vcxproj /p:Configuration=$Env:CONFIGURATION
-      msbuild artifacts/bin64/bitshuffle/bitshuffle.vcxproj /p:Configuration=$Env:CONFIGURATION
+      msbuild artifacts/bin32/bitshuffle.vcxproj /p:Configuration=$Env:CONFIGURATION
+      msbuild artifacts/bin64/bitshuffle.vcxproj /p:Configuration=$Env:CONFIGURATION
 
       dotnet build src/Bitshuffle.PInvoke/Bitshuffle.PInvoke.csproj -c $Env:CONFIGURATION /p:Build=$Env:APPVEYOR_BUILD_NUMBER /p:IsFinalBuild=$Env:APPVEYOR_REPO_TAG /p:IsPublicBuild=True
     }
@@ -64,8 +64,8 @@ after_build:
 - ps: |
     if ($isWindows) 
     { 
-      Push-AppveyorArtifact "artifacts/bin32/$env:FileName" -FileName "lib32"
-      Push-AppveyorArtifact "artifacts/bin64/$env:FileName" -FileName "lib64"
+      Push-AppveyorArtifact "artifacts/bin32/Release/$env:FileName" -FileName "lib32"
+      Push-AppveyorArtifact "artifacts/bin64/Release/$env:FileName" -FileName "lib64"
     }
 
 test_script:
