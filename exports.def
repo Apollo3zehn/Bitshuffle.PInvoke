@@ -1,0 +1,11 @@
+EXPORTS 
+    bshuf_using_NEON
+    bshuf_using_SSE2
+    bshuf_using_AVX2
+    bshuf_using_AVX512
+    bshuf_default_block_size
+    bshuf_bitshuffle
+    bshuf_bitunshuffle
+    bshuf_compress_lz4_bound
+    bshuf_compress_lz4
+    bshuf_decompress_lz4

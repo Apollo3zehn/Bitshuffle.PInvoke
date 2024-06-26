@@ -21,5 +21,10 @@ file(GLOB SOURCE_FILES ${SRC}/*.c ${LZ4}/*.c)
 list(FILTER SOURCE_FILES EXCLUDE REGEX "h5|hdf5")
 
 # library
-add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES} ${HEADER_FILES})
+add_library(${PROJECT_NAME} SHARED 
+    ${CMAKE_CURRENT_SOURCE_DIR}/exports.def
+    ${SOURCE_FILES} 
+    ${HEADER_FILES}
+)
+
 target_include_directories(${PROJECT_NAME} PRIVATE ${LZ4})
