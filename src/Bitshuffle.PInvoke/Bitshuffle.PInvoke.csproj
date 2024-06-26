@@ -37,11 +37,11 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(IsPublicBuild)' == '' AND $(IsWindows) == 'True'">
-    <Content Include="./../../artifacts/bin32/bitshuffle.dll" Link="runtimes/win-x86/native/bitshuffle.dll">
+    <Content Include="./../../artifacts/bin32/Release/bitshuffle.dll" Link="runtimes/win-x86/native/bitshuffle.dll">
       <PackagePath>runtimes/win-x86/native</PackagePath>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="./../../artifacts/bin64/bitshuffle.dll" Link="runtimes/win-x64/native/bitshuffle.dll">
+    <Content Include="./../../artifacts/bin64/Release/bitshuffle.dll" Link="runtimes/win-x64/native/bitshuffle.dll">
       <PackagePath>runtimes/win-x64/native</PackagePath>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
