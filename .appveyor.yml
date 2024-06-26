@@ -13,7 +13,7 @@ environment:
 
 branches:
   only:
-  - main
+  - master
   - dev
 
 configuration:
@@ -27,13 +27,7 @@ install:
     if ($isLinux) 
     { 
       sudo apt-get update
-      # apt-get --yes install g++-multilib
-      sudo apt-get --yes install nasm
-    }
-    elseif ($isWindows)
-    {
-      choco install nasm
-      $env:Path += ";C:\Program Files\NASM"
+      sudo apt-get --yes install g++-multilib
     }
 
 before_build:
@@ -44,8 +38,8 @@ before_build:
 - ps: | 
     if ($isLinux) 
     { 
-      #New-Item -Force -ItemType directory -Path "artifacts/download/bin32/"
-      #Start-ArtifactDownload -JobName $env:SatelliteJobName -SourceFileName "lib32" -TargetFilePath "artifacts/download/bin32/$env:FileName" -ApiKey $env:ApiKey
+      New-Item -Force -ItemType directory -Path "artifacts/download/bin32/"
+      Start-ArtifactDownload -JobName $env:SatelliteJobName -SourceFileName "lib32" -TargetFilePath "artifacts/download/bin32/$env:FileName" -ApiKey $env:ApiKey
       New-Item -Force -ItemType directory -Path "artifacts/download/bin64/"
       Start-ArtifactDownload -JobName $env:SatelliteJobName -SourceFileName "lib64" -TargetFilePath "artifacts/download/bin64/$env:FileName" -ApiKey $env:ApiKey 
     }
@@ -54,42 +48,29 @@ build_script:
 - ps: |
     if ($isLinux) 
     { 
-      New-Item -Force -ItemType directory -Path "artifacts/bin64"
-      cd native/bitshuffle
-      make -f Makefile.unx
-      mv bin/libbitshuffle.so ../../artifacts/bin64/libbitshuffle.so
-      cd ../../
+      make --directory "artifacts/bin64"
 
-      dotnet build src/Bitshuffle.PInvoke/Bitshuffle.PInvoke.csproj -c $Env:CONFIGURATION /p:Build=$Env:APPVEYOR_BUILD_NUMBER /p:IsFinalBuild=$Env:APPVEYOR_REPO_TAG /p:IsPublicBuild=True
+      dotnet build src/Bitshuffle.PInvoke/Bitshuffle.PInvoke.csproj -c $Env:CONFIGURATION /p:Build=$Env:APPVEYOR_BUILD_NUMBER /p:IsFinalBuild=$Env:APPVEYOR_REPO_TAG
     }
     elseif ($isWindows)
     { 
-      # 32-bit builds are not working right now because ASM sections for x86 are missing (https://github.com/intel/bitshuffle/issues/3#issuecomment-549359980).
-      # New-Item -Force -ItemType directory -Path "artifacts/bin32"
-      # cmd.exe /c "`"C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars32.bat`" & cd native/bitshuffle & nmake -f Makefile.nmake arch=32 & move bitshuffle.dll ../../artifacts/bin32"
+      msbuild artifacts/bin32/bitshuffle/bitshuffle.vcxproj /p:Configuration=$Env:CONFIGURATION
+      msbuild artifacts/bin64/bitshuffle/bitshuffle.vcxproj /p:Configuration=$Env:CONFIGURATION
 
-      # Remove-Item -Recurse -Force native/bitshuffle/bin
-
-      New-Item -Force -ItemType directory -Path "artifacts/bin64"
-      cmd.exe /c "`"C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat`" & cd native/bitshuffle & nmake -f Makefile.nmake & move bitshuffle.dll ../../artifacts/bin64"
-      
-      dotnet build src/Bitshuffle.PInvoke/Bitshuffle.PInvoke.csproj -c $Env:CONFIGURATION /p:Build=$Env:APPVEYOR_BUILD_NUMBER /p:IsFinalBuild=$Env:APPVEYOR_REPO_TAG
+      dotnet build src/Bitshuffle.PInvoke/Bitshuffle.PInvoke.csproj -c $Env:CONFIGURATION /p:Build=$Env:APPVEYOR_BUILD_NUMBER /p:IsFinalBuild=$Env:APPVEYOR_REPO_TAG /p:IsPublicBuild=True
     }
 
 after_build:
 - ps: |
     if ($isWindows) 
     { 
-      #Push-AppveyorArtifact "artifacts/bin32/$env:FileName" -FileName "lib32"
+      Push-AppveyorArtifact "artifacts/bin32/$env:FileName" -FileName "lib32"
       Push-AppveyorArtifact "artifacts/bin64/$env:FileName" -FileName "lib64"
     }
 
 test_script:
 - ps: |
     dotnet test tests/Bitshuffle.PInvoke.Tests -c $Env:CONFIGURATION /p:BuildProjectReferences=false
-
-after_test:
-  - ps: if (-Not $isLinux) { Remove-Item artifacts/packages/*.nupkg }
 
 artifacts:
   - path: artifacts/packages/**/*.nupkg
@@ -111,7 +92,7 @@ deploy:
   - provider: NuGet
     server: https://www.nuget.org/api/v2/package
     api_key:
-      secure: sRqSXx9AEunKwTrsXo9ppB8cGnMXaJI+ICjvoTaKLBS8curIxXuKxfzcw7iKCPjg
+      secure: /d9VPIvM5/7g1kqzb7VB05BeRpHRtG1U+9nkJ9VMBdwXmjqwRDAGL6OUQyA1iFGv
     skip_symbols: true
     artifact: /.*\.nupkg/ 
     on:

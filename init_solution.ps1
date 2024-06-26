@@ -7,13 +7,13 @@ $path = "$($PSScriptRoot)/artifacts/bin32"
 New-Item -Force -ItemType directory -Path $path
 Set-Location -Path $path
 
-if ($IsWindows)
+if ($IsLinux)
 {
-	cmake ./../../ -DCMAKE_CONFIGURATION_TYPES:STRING="Debug;Release" -G "Visual Studio 16 2019" -A "Win32"
+	# do nothing
 }
-elseif ($IsLinux)
+elseif ($IsWindows)
 {
-    # do nothing
+    cmake ../../ -DCMAKE_CONFIGURATION_TYPES:STRING="Debug;Release" -G "Visual Studio 16 2019" -A "Win32"
 }
 else 
 {
@@ -26,13 +26,13 @@ $path = "$($PSScriptRoot)/artifacts/bin64"
 New-Item -Force -ItemType directory -Path $path
 Set-Location -Path $path
 
-if ($IsWindows)
+if ($IsLinux)
 {
-	cmake ./../../ -DCMAKE_CONFIGURATION_TYPES:STRING="Debug;Release" -G "Visual Studio 16 2019" -A "x64"
+    cmake ../../ -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS=-m64 -DCMAKE_CXX_FLAGS=-m64
 }
-elseif ($IsLinux)
+elseif ($IsWindows)
 {
-    cmake ./../../ -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS=-m64 -DCMAKE_CXX_FLAGS=-m64
+    cmake ../../ -DCMAKE_CONFIGURATION_TYPES:STRING="Debug;Release" -G "Visual Studio 16 2019" -A "x64"
 }
 else 
 {
