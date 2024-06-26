@@ -17,10 +17,21 @@ public class PInvokeTests : IClassFixture<PInvokeFixture>
         var hasAVX512 = Bitshuffle.bshuf_using_AVX512();
 
         // Assert
-        Assert.Equal(0, hasNEON);
-        Assert.Equal(1, hasSSE2);
-        Assert.Equal(0, hasAVX2);
-        Assert.Equal(0, hasAVX512);
+        if (OperatingSystem.IsLinux())
+        {
+            Assert.Equal(0, hasNEON);
+            Assert.Equal(1, hasSSE2);
+            Assert.Equal(0, hasAVX2);
+            Assert.Equal(0, hasAVX512);
+        }
+
+        else
+        {
+            Assert.Equal(0, hasNEON);
+            Assert.Equal(0, hasSSE2);
+            Assert.Equal(0, hasAVX2);
+            Assert.Equal(0, hasAVX512);
+        }
     }
 
     [Fact]
