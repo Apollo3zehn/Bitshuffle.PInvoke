@@ -1,0 +1,3 @@
+[submodule "native/bitshuffle"]
+	path = native/bitshuffle
+	url = git@github.com:kiyo-masui/bitshuffle.git
