@@ -2,12 +2,11 @@ cmake_minimum_required(VERSION 3.27.1)
 project(bitshuffle)
 
 # variables
-
-# We stick with SSE since there are no runtime
-# checks for available instruction sets in the
-# bitshuffle code.
-# 
-# set(CMAKE_C_FLAGS "-mavx2") 
+if(MSVC)
+    add_definitions(/arch:AVX2)
+else()
+    set(CMAKE_C_FLAGS "-mavx2")
+endif()
 
 set(SRC "native/bitshuffle/src")
 set(LZ4 "native/bitshuffle/lz4")

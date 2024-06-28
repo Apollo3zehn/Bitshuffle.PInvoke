@@ -20,8 +20,8 @@ public class PInvokeTests : IClassFixture<PInvokeFixture>
         if (OperatingSystem.IsLinux())
         {
             Assert.Equal(0, hasNEON);
-            Assert.Equal(1, hasSSE2);
-            Assert.Equal(0, hasAVX2);
+            Assert.Equal(0, hasSSE2);
+            Assert.Equal(1, hasAVX2);
             Assert.Equal(0, hasAVX512);
         }
 
@@ -29,7 +29,7 @@ public class PInvokeTests : IClassFixture<PInvokeFixture>
         {
             Assert.Equal(0, hasNEON);
             Assert.Equal(0, hasSSE2);
-            Assert.Equal(0, hasAVX2);
+            Assert.Equal(1, hasAVX2);
             Assert.Equal(0, hasAVX512);
         }
     }
