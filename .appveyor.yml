@@ -54,6 +54,9 @@ build_script:
     }
     elseif ($isWindows)
     { 
+      cd native/bitshuffle
+      git apply ../../add-missing-typedef.patch
+      cd ../..
       msbuild artifacts/bin32/bitshuffle.vcxproj /p:Configuration=$Env:CONFIGURATION
       msbuild artifacts/bin64/bitshuffle.vcxproj /p:Configuration=$Env:CONFIGURATION
 
