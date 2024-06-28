@@ -11,10 +11,10 @@ public class PInvokeTests : IClassFixture<PInvokeFixture>
     public void HasExpectedIntrinsics()
     {
         // Act
-        var hasNEON = Bitshuffle.bshuf_using_NEON();
-        var hasSSE2 = Bitshuffle.bshuf_using_SSE2();
-        var hasAVX2 = Bitshuffle.bshuf_using_AVX2();
-        var hasAVX512 = Bitshuffle.bshuf_using_AVX512();
+        var hasNEON = BitshuffleMethods.bshuf_using_NEON();
+        var hasSSE2 = BitshuffleMethods.bshuf_using_SSE2();
+        var hasAVX2 = BitshuffleMethods.bshuf_using_AVX2();
+        var hasAVX512 = BitshuffleMethods.bshuf_using_AVX512();
 
         // Assert
         if (OperatingSystem.IsLinux())
@@ -51,7 +51,7 @@ public class PInvokeTests : IClassFixture<PInvokeFixture>
         // Act
         fixed (int* originalPtr = original, shuffledPtr = shuffled, unshuffledPtr = unshuffled)
         {
-            var bytesProcessed1 = Bitshuffle.bshuf_bitshuffle(
+            var bytesProcessed1 = BitshuffleMethods.bshuf_bitshuffle(
                 @in: originalPtr,
                 @out: shuffledPtr,
                 size: original.Length,
@@ -62,7 +62,7 @@ public class PInvokeTests : IClassFixture<PInvokeFixture>
             Assert.Equal(400, bytesProcessed1);
             Assert.NotEqual(original[0], shuffled[0]);
 
-            var bytesProcessed2 = Bitshuffle.bshuf_bitunshuffle(
+            var bytesProcessed2 = BitshuffleMethods.bshuf_bitunshuffle(
                 @in: shuffledPtr,
                 @out: unshuffledPtr,
                 size: original.Length,

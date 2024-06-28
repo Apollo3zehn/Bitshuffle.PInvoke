@@ -3,7 +3,7 @@ using System.Security;
 
 namespace Bitshuffle.PInvoke
 {
-    public static class Bitshuffle
+    public static class BitshuffleMethods
     {
         [SuppressUnmanagedCodeSecurity]
         [DllImport(Constants.NATIVE_DLL_NAME)]
