@@ -4,6 +4,7 @@ project(bitshuffle)
 # variables
 if(MSVC)
     add_definitions(/arch:AVX2)
+    add_compile_definitions(__SSE2__)
 else()
     set(CMAKE_C_FLAGS "-mavx2")
 endif()
